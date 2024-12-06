@@ -1,0 +1,22 @@
+version: '3'
+#сервис это контейнер
+services:
+  server:
+  #указывает путь до докерфайла
+    build: /Server
+    #проброс портов
+    ports:
+      - 6080:8090
+    #если аварийно закончил работу, можно вооьще это убрать
+    restart: always
+    depends_on: # важно! зависимость от postgres, типо что бы сервак запускался после бд
+      - postgres
+  postgres:
+      image: postgres:17 
+      ports:
+        - "5433:5432" 
+      restart: always
+      environment:
+        - POSTGRES_USER=nicis
+        - POSTGRES_PASSWORD=123
+        - POSTGRES_DB=kudago
