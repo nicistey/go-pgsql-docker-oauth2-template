@@ -50,11 +50,6 @@ func (api *api) getEventByID(w http.ResponseWriter, r *http.Request){
 
 
 func (api *api) newEvent(w http.ResponseWriter, r *http.Request){
-	// TODO: вынести в middleware
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    if r.Method == http.MethodOptions {
-        return
-    }
 	var events models.Event
 	//принимает указатель на структуру 
 	err:=json.NewDecoder(r.Body).Decode(&events)
@@ -76,10 +71,6 @@ func (api *api) newEvent(w http.ResponseWriter, r *http.Request){
 }
 
 func (api *api) updateEvent(w http.ResponseWriter, r *http.Request){
-	// TODO: вынести в middleware
-    if r.Method == http.MethodOptions {
-        return
-    }
 	var events models.Event
 	//принимает указатель на структуру 
 	vars:= mux.Vars(r)

@@ -6,10 +6,6 @@ import (
 )
 
 
-// /api
-// /events/
-
-
 func (api *api) middleware(next http.Handler) http.Handler { // Определяет middleware функцию как метод структуры api, принимающую следующий обработчик (next) и возвращающую новый обработчик.
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { // Создает новый обработчик с помощью http.HandlerFunc.
 	 log.Println(r.URL.Path, r.Method) // Логирует путь и метод запроса.

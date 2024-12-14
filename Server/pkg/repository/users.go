@@ -8,7 +8,7 @@ import (
 
 func (repo *PGRepo) GetUsers() ([]models.User, error) {//curl http://localhost:8090/api/users
 	rows, err := repo.pool.Query(context.Background(), 
-		`SELECT IDus, login, password
+		`SELECT IDus, IDgoogle, name, email
   		FROM users;
  `)
 
@@ -22,8 +22,9 @@ func (repo *PGRepo) GetUsers() ([]models.User, error) {//curl http://localhost:8
 		var item models.User 
 		err = rows.Scan(    
 			&item.IDus,
-			&item.Login,
-			&item.Password,
+			&item.GoogleID,
+			&item.Name,
+			&item.Email,
 		)
 		if err != nil {
 			return nil, err 
@@ -36,11 +37,12 @@ func (repo *PGRepo) NewUser(item models.User) (id int, err error) {//curl -X POS
 	// repo.mu.Lock()
 	// defer repo.mu.Unlock()
 	err = repo.pool.QueryRow(context.Background(), `
-	INSERT INTO users ( login, password)
-	VALUES ( $1, $2)
+	INSERT INTO users ( IDgoogle, name,email )
+	VALUES ( $1, $2, $3)
 	RETURNING IDus;`,
-		&item.Login,
-		&item.Password,
+		&item.GoogleID,
+		&item.Name,
+		&item.Email,
 	).Scan(&id)
 	return id, err
 }
@@ -51,11 +53,12 @@ func (repo *PGRepo) UpdateUser(IDus int,item models.User) (id int, err error) {/
 	// defer repo.mu.Unlock()
 	err = repo.pool.QueryRow(context.Background(), `
 		UPDATE users
-		SET password = $2
+		SET name = $2, email = $3
 		WHERE IDus = $1
 		RETURNING IDus;`,
 		&IDus,
-		&item.Password,
+		&item.Name,
+		&item.Email,
 	).Scan(&id)
 	return id, err
 }
@@ -63,13 +66,14 @@ func (repo *PGRepo) UpdateUser(IDus int,item models.User) (id int, err error) {/
 func (repo *PGRepo) GetUserByID(id int) (models.User, error) {//curl http://localhost:8090/api/users
 	var user models.User
 	err := repo.pool.QueryRow(context.Background(), 
-		`SELECT IDus, login,password
+		`SELECT IDus, IDgoogle,name,email
 		FROM users
 		WHERE IDus =$1;
  `,id).Scan(
 	&user.IDus,
-	&user.Login,
-	&user.Password,
+	&user.GoogleID,
+	&user.Name,
+	&user.Email,
  )
 
 	if err != nil {
@@ -87,4 +91,14 @@ func (repo *PGRepo) DeleteUser(id int) ( err error) {//curl http://localhost:809
 		id,
 	)
 	return err
+}
+func (repo *PGRepo) CheckGoogleIDExists(googleID string) (bool, error) {
+    var exists bool
+    err := repo.pool.QueryRow(context.Background(),`SELECT EXISTS (SELECT 1 FROM users WHERE IDGoogle = $1)`, 
+		googleID).Scan(
+		&exists)
+    if err != nil {
+        return false, err // Обработка ошибки
+    }
+    return exists, nil
 }

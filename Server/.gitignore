@@ -1,2 +1,3 @@
 cmd/main
 /pkg/repository/events_test.go
+.env
