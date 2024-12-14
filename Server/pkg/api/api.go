@@ -11,6 +11,7 @@ type api struct {
 	r   *mux.Router
 	db  *repository.PGRepo
 	cfg *config.Config 
+	
    }
 
 func New(router *mux.Router, db *repository.PGRepo, cfg *config.Config) *api {

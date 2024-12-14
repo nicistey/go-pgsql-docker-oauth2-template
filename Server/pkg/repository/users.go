@@ -83,6 +83,26 @@ func (repo *PGRepo) GetUserByID(id int) (models.User, error) {//curl http://loca
 	return user, err 
 }
 
+func (repo *PGRepo) GetUserByGoogleID(id string) (models.User, error) {//curl http://localhost:8090/api/users
+	var user models.User
+	err := repo.pool.QueryRow(context.Background(), 
+		`SELECT IDus, IDgoogle,name,email
+		FROM users
+		WHERE IDgoogle =$1;
+ `,id).Scan(
+	&user.IDus,
+	&user.GoogleID,
+	&user.Name,
+	&user.Email,
+ )
+
+	if err != nil {
+		return models.User{}, err 
+	}
+
+	return user, err 
+}
+
 func (repo *PGRepo) DeleteUser(id int) ( err error) {//curl http://localhost:8090/api/users
 	// repo.mu.Lock()
 	// defer repo.mu.Unlock()
@@ -98,7 +118,7 @@ func (repo *PGRepo) CheckGoogleIDExists(googleID string) (bool, error) {
 		googleID).Scan(
 		&exists)
     if err != nil {
-        return false, err // Обработка ошибки
+        return false, err 
     }
     return exists, nil
 }
