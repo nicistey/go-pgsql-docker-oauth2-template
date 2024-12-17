@@ -4,8 +4,39 @@ import (
 	"Server/pkg/models" 
 	"context"              
 )
+func (repo *PGRepo) GetEventsByID(IDus int) ([]models.Event, error) {//curl http://localhost:8090/api/events
+	rows, err := repo.pool.Query(context.Background(), 
+		`SELECT  IDev, IDus, event_name, event_time, description,location,is_public
+		FROM events
+		WHERE IDev =$1;
+ `,IDus)
 
+	if err != nil {
+		return nil, err 
+	}
+	defer rows.Close() 
+
+	var data []models.Event 
+	for rows.Next() {      
+		var item models.Event 
+		err = rows.Scan(     
+			&item.IDev,
+			&item.IDus,
+			&item.Event_name,
+			&item.Event_time,
+			&item.Description,
+			&item.Location,
+			&item.Is_public,
+		)
+		if err != nil {
+			return nil, err 
+		}
+		data = append(data, item) 
+	}
+	return data, nil 
+}
 // 
+
 func (repo *PGRepo) GetEvents() ([]models.Event, error) {//curl http://localhost:8090/api/events
 	rows, err := repo.pool.Query(context.Background(), 
 		`SELECT IDev, IDus, event_name, event_time, description,location,is_public

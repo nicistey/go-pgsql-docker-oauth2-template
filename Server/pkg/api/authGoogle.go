@@ -65,75 +65,73 @@ func (api *api)handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 	url := oGoogleAuthConfig.AuthCodeURL("state", oauth2.AccessTypeOffline)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
-func (api *api) handleGoogleCallback(w http.ResponseWriter, r *http.Request) { 
-	oGoogleAuthConfig := getOAuthConfig(api.cfg)
-	code := r.FormValue("code") 
-	if code == "" {            
-		http.Error(w, "Error1!", http.StatusBadRequest) 
-		return                                         
-	}
+func (api *api) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+    oGoogleAuthConfig := getOAuthConfig(api.cfg)
 
-	token, err := oGoogleAuthConfig.Exchange(context.Background(), code) 
-	if err != nil {                                             
-		http.Error(w, fmt.Sprintf("Error2!: %v", err), http.StatusInternalServerError) 
-		return                                                             
-	}
+    code := r.URL.Query().Get("code")
+    //state := r.URL.Query().Get("state")
 
-	client := oGoogleAuthConfig.Client(context.Background(), token) 
-	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo") 
-	if err != nil {                                                              
-		http.Error(w, fmt.Sprintf("Не смог получить инфу юзера: %v", err), http.StatusInternalServerError) 
-		return                                                                     
-	}
-	defer userInfo.Body.Close() 
+    if code == "" {
+        http.Error(w, "Error: Missing code parameter", http.StatusBadRequest)
+        return
+    }
 
-	var googleUser GoogleUser 
-	err = json.NewDecoder(userInfo.Body).Decode(&googleUser) 
-	if err != nil {                                   
-		http.Error(w, fmt.Sprintf("Не смог декодировать данные в декоде: %v", err), http.StatusInternalServerError) 
-		return                                                                         
-	}
-	existsUserByGoogleID, err :=api.db.CheckGoogleIDExists(googleUser.ID)
-	if err != nil {                                   
-		http.Error(w, fmt.Sprintf("Ошибка в проверке пользователя по GoogleID: %v", err), http.StatusInternalServerError) 
-		return                                                                          
-	}
-	log.Println(existsUserByGoogleID)
-	var user models.User
-	if (!existsUserByGoogleID){
-		
-		user.GoogleID = googleUser.ID
-		user.Name = googleUser.Name
-		user.Email=googleUser.Email
-		id, err := api.db.NewUser(user)
-		if err!=nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		err=json.NewEncoder(w).Encode(id)
-		if err!=nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}else{
-		log.Println("Существует пользователь  с GoogleID: " +googleUser.ID )
-		user, err = api.db.GetUserByGoogleID(googleUser.ID)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-	secretKey := api.cfg.SecretJWTKey
-	tokenString, err := generateJWT(user.IDus, googleUser.ID, googleUser.Name, googleUser.Email, secretKey)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+    token, err := oGoogleAuthConfig.Exchange(context.Background(), code)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Error exchanging code for token: %v, Code: %s", err, code), http.StatusInternalServerError)
+        log.Printf("Google OAuth2 error: %v, Code: %s", err, code)
+        return
+    }
 
-	// отправка JWT клиенту
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+    client := oGoogleAuthConfig.Client(context.Background(), token)
+    userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Error getting user info: %v", err), http.StatusInternalServerError)
+        return
+    }
+    defer userInfo.Body.Close()
 
-	
+    var googleUser GoogleUser
+    err = json.NewDecoder(userInfo.Body).Decode(&googleUser)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Error decoding user info: %v", err), http.StatusInternalServerError)
+        return
+    }
+	existsUserByGoogleID, err := api.db.CheckGoogleIDExists(googleUser.ID)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Ошибка в проверке пользователя по GoogleID: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    var user models.User
+    if !existsUserByGoogleID {
+        user.GoogleID = googleUser.ID
+        user.Name = googleUser.Name
+        user.Email = googleUser.Email
+        _, err := api.db.NewUser(user)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+        //  Этот код уже был - сохраним его!
+        // err = json.NewEncoder(w).Encode(id) // удаляем эту строку!
+
+    } else {
+        log.Println("Существует пользователь  с GoogleID: " + googleUser.ID)
+        user, err = api.db.GetUserByGoogleID(googleUser.ID)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    secretKey := api.cfg.SecretJWTKey
+    tokenString, err := generateJWT(user.IDus, googleUser.ID, googleUser.Name, googleUser.Email, secretKey)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{"token": tokenString}) // <--- Добавлено здесь!
 }
-

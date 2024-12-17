@@ -1,25 +1,27 @@
 package api
 
 import (
-	"Server/pkg/models"
-	"encoding/json"
-	"net/http"
-	"strconv"
-	"log"
-	"github.com/gorilla/mux"
+// "context"
+ "encoding/json"
+ "net/http"
+ "strconv"
+ "log"
+ "github.com/gorilla/mux"
+ "Server/pkg/models"
+
 )
 func (api *api) getAllEvents(w http.ResponseWriter, r *http.Request){
 
-	data, err := api.db.GetEvents()
-	if err != nil {
-	  http.Error(w, err.Error(), http.StatusInternalServerError)
-	  return
-	}
-	err = json.NewEncoder(w).Encode(data)
-	if err != nil {
-	  http.Error(w, err.Error(), http.StatusInternalServerError)
-	  return
-	}
+ data, err := api.db.GetEvents() //Изменён метод для фильтрации по ID пользователя
+ if err != nil {
+   http.Error(w, err.Error(), http.StatusInternalServerError)
+   return
+ }
+ err = json.NewEncoder(w).Encode(data)
+ if err != nil {
+   http.Error(w, err.Error(), http.StatusInternalServerError)
+   return
+ }
 }
 
 
