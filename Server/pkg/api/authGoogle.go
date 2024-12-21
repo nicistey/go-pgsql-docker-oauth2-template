@@ -1,17 +1,19 @@
 package api
 
 import (
-	"Server/pkg/models"
 	"Server/config"
-	"context"       
-	"encoding/json" 
-	"fmt"           
+	"Server/pkg/models"
+	"context"
+	"encoding/json"
+	"fmt"
 	"log"
-	"net/http" 
-	"golang.org/x/oauth2"        
-	"golang.org/x/oauth2/google" 
+	"net/http"
+	"net/url"
 	"time"
- 	"github.com/golang-jwt/jwt/v5"
+
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 type Claims struct {
@@ -132,6 +134,7 @@ func (api *api) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(map[string]string{"token": tokenString}) // <--- Добавлено здесь!
+    // Redirect to frontend with token as a query parameter
+    redirectURL := fmt.Sprintf("http://localhost:8080/callback?token=%s", url.QueryEscape(tokenString))
+    http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
