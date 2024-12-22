@@ -52,15 +52,21 @@ func (api *api) getEventByID(w http.ResponseWriter, r *http.Request){
 
 
 func (api *api) newEvent(w http.ResponseWriter, r *http.Request){
+	userID, ok := r.Context().Value("userID").(int) //приводим к нужному типу
+	if !ok {
+		http.Error(w, "Missing or invalid userID in context", http.StatusInternalServerError)
+		return
+	}
 	var events models.Event
 	//принимает указатель на структуру 
+	
 	err:=json.NewDecoder(r.Body).Decode(&events)
 	if err!=nil {
 		http.Error(w, "error in parsing params", http.StatusInternalServerError)
 		return
 	}
 
-	id, err := api.db.NewEvent(events)
+	id, err := api.db.NewEvent(events, userID)
 	if err!=nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
