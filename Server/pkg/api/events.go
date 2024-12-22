@@ -1,25 +1,27 @@
 package api
 
 import (
-	"Server/pkg/models"
-	"encoding/json"
-	"net/http"
-	"strconv"
-	"log"
-	"github.com/gorilla/mux"
+// "context"
+ "encoding/json"
+ "net/http"
+ "strconv"
+ "log"
+ "github.com/gorilla/mux"
+ "Server/pkg/models"
+
 )
 func (api *api) getAllEvents(w http.ResponseWriter, r *http.Request){
 
-	data, err := api.db.GetEvents()
-	if err != nil {
-	  http.Error(w, err.Error(), http.StatusInternalServerError)
-	  return
-	}
-	err = json.NewEncoder(w).Encode(data)
-	if err != nil {
-	  http.Error(w, err.Error(), http.StatusInternalServerError)
-	  return
-	}
+ data, err := api.db.GetEvents() //Изменён метод для фильтрации по ID пользователя
+ if err != nil {
+   http.Error(w, err.Error(), http.StatusInternalServerError)
+   return
+ }
+ err = json.NewEncoder(w).Encode(data)
+ if err != nil {
+   http.Error(w, err.Error(), http.StatusInternalServerError)
+   return
+ }
 }
 
 
@@ -50,20 +52,21 @@ func (api *api) getEventByID(w http.ResponseWriter, r *http.Request){
 
 
 func (api *api) newEvent(w http.ResponseWriter, r *http.Request){
-	// TODO: вынести в middleware
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    if r.Method == http.MethodOptions {
-        return
-    }
+	userID, ok := r.Context().Value("userID").(int) //приводим к нужному типу
+	if !ok {
+		http.Error(w, "Missing or invalid userID in context", http.StatusInternalServerError)
+		return
+	}
 	var events models.Event
 	//принимает указатель на структуру 
+	
 	err:=json.NewDecoder(r.Body).Decode(&events)
 	if err!=nil {
 		http.Error(w, "error in parsing params", http.StatusInternalServerError)
 		return
 	}
 
-	id, err := api.db.NewEvent(events)
+	id, err := api.db.NewEvent(events, userID)
 	if err!=nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -76,10 +79,6 @@ func (api *api) newEvent(w http.ResponseWriter, r *http.Request){
 }
 
 func (api *api) updateEvent(w http.ResponseWriter, r *http.Request){
-	// TODO: вынести в middleware
-    if r.Method == http.MethodOptions {
-        return
-    }
 	var events models.Event
 	//принимает указатель на структуру 
 	vars:= mux.Vars(r)

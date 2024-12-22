@@ -27,7 +27,7 @@ func (api *api) getUserByID(w http.ResponseWriter, r *http.Request){
 	stringID := vars["IDus"]
 	id, err := strconv.Atoi(stringID)
 	if err != nil {
-	  http.Error(w, "Invalid user ID", http.StatusBadRequest) // Более информативное сообщение об ошибке
+	  http.Error(w, "Invalid user ID", http.StatusBadRequest) 
 	  return
 	}
 	data, err := api.db.GetUserByID(id)

@@ -12,8 +12,15 @@ type Event struct {
 	Is_public   bool
 }
 
+// type User struct {
+// 	IDus     int
+// 	Login    string
+// 	GoogleID string 
+// 	Password string
+//    }
 type User struct {
 	IDus     int
-	Login    string
-	Password string
+	GoogleID string 
+	Name string
+	Email string
 }

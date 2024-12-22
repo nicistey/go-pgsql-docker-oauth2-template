@@ -2,25 +2,30 @@ package api
 
 import (
 	"Server/pkg/repository"
+	"Server/config"
 	"net/http"
-
-	//"github.com/rs/cors"
-
-	// "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 type api struct {
-	r  *mux.Router
-	db *repository.PGRepo
+	r   *mux.Router
+	db  *repository.PGRepo
+	cfg *config.Config 
+	
+   }
+
+func New(router *mux.Router, db *repository.PGRepo, cfg *config.Config) *api {
+	return &api{r: router, db: db, cfg: cfg}
 }
 
-func New(router *mux.Router, db *repository.PGRepo) *api {
-	return &api{r: router, db: db}
-}
 
-func (api *api) Hadle() {
+
+func (api *api) Hadle(cfg *config.Config) {
 	//прописали, что функция принимает только гет метод прямо в инициализации, можно перечислять.Queries объясняем что возможно будем педавать
+	api.r.HandleFunc("/auth", api.handleGoogleAuth).Methods(http.MethodGet,http.MethodOptions)
+	api.r.HandleFunc("/auth/callback", api.handleGoogleCallback).Methods(http.MethodGet,http.MethodOptions)
+	
+	
 	api.r.HandleFunc("/api/users", api.getAllUsers).Methods(http.MethodGet,http.MethodOptions)        // получение всех юзеров
 	api.r.HandleFunc("/api/users/{IDus}", api.getUserByID).Methods(http.MethodGet,http.MethodOptions) // получение юзера по ID
 	api.r.HandleFunc("/api/users", api.newUser).Methods(http.MethodPost,http.MethodOptions)           // создание нового юзера
