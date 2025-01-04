@@ -32,7 +32,7 @@ func (api *api) Hadle(cfg *config.Config) {
 	api.r.HandleFunc("/api/users/{IDus}", api.updateUser).Methods(http.MethodPost,http.MethodOptions)
 	api.r.HandleFunc("/api/users/{IDus}", api.deleteUser).Methods(http.MethodDelete,http.MethodOptions)              // удаление юзера
 	api.r.HandleFunc("/api/events", api.getAllEvents).Methods(http.MethodGet, http.MethodOptions) // получение всех ивентов
-	api.r.HandleFunc("/api/events/{IDev}", api.getEventByID).Methods(http.MethodGet, http.MethodOptions)
+	api.r.HandleFunc("/api/eventsByID", api.getEventsByID).Methods(http.MethodGet, http.MethodOptions)
 	api.r.HandleFunc("/api/events", api.newEvent).Methods(http.MethodPost, http.MethodOptions)
 	api.r.HandleFunc("/api/events/{IDev}", api.updateEvent).Methods(http.MethodPost, http.MethodOptions)
 	api.r.HandleFunc("/api/events/{IDev}", api.deleteEvent).Methods(http.MethodDelete, http.MethodOptions)

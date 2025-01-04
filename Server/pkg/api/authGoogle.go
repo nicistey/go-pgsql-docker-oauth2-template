@@ -67,6 +67,7 @@ func (api *api)handleGoogleAuth(w http.ResponseWriter, r *http.Request) {
 	url := oGoogleAuthConfig.AuthCodeURL("state", oauth2.AccessTypeOffline)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
+
 func (api *api) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
     oGoogleAuthConfig := getOAuthConfig(api.cfg)
 

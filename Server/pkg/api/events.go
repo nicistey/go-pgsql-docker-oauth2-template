@@ -25,29 +25,22 @@ func (api *api) getAllEvents(w http.ResponseWriter, r *http.Request){
 }
 
 
-func (api *api) getEventByID(w http.ResponseWriter, r *http.Request){
-	// TODO: вынести в middleware
-    w.Header().Set("Access-Control-Allow-Origin", "*")
-    if r.Method == http.MethodOptions {
-        return
-    }
-	vars := mux.Vars(r)
-	stringID := vars["IDev"]
-	id, err := strconv.Atoi(stringID)
-	if err != nil {
-	  http.Error(w, "Invalid Events ID", http.StatusBadRequest) // Более информативное сообщение об ошибке
-	  return
+func (api *api) getEventsByID(w http.ResponseWriter, r *http.Request){
+	userID, ok := r.Context().Value("userID").(int) //приводим к нужному типу
+	if !ok {
+		http.Error(w, "Missing or invalid userID in context", http.StatusInternalServerError)
+		return
 	}
-	data, err := api.db.GetEventByID(id)
-  if err != nil {
-    http.Error(w, err.Error(), http.StatusInternalServerError)
-    return
-  }
-  err = json.NewEncoder(w).Encode(data)
-  if err != nil {
-    http.Error(w, err.Error(), http.StatusInternalServerError)
-    return
-  }
+	data, err := api.db.GetEventsByID(userID)
+  	if err != nil {
+    	http.Error(w, err.Error(), http.StatusInternalServerError)
+    	return
+  	}	
+  	err = json.NewEncoder(w).Encode(data)
+  	if err != nil {
+    	http.Error(w, err.Error(), http.StatusInternalServerError)
+    	return
+  	}
 }
 
 
