@@ -9,7 +9,18 @@
 - Middleware для обработки запросов
 - Настройка CORS политики
 
-**GIF**
+**Настроенный шаблон клиента для подключения к серверу**
+
+[Frontend](https://github.com/nicistey/vue-event-manager-jwt) [Frontend](https://github.com/nicistey/vue-event-manager-jwt) [Frontend](https://github.com/nicistey/vue-event-manager-jwt)
+
+[Frontend](https://github.com/nicistey/vue-event-manager-jwt) [Frontend](https://github.com/nicistey/vue-event-manager-jwt) [Frontend](https://github.com/nicistey/vue-event-manager-jwt)
+
+[Frontend](https://github.com/nicistey/vue-event-manager-jwt) [Frontend](https://github.com/nicistey/vue-event-manager-jwt) [Frontend](https://github.com/nicistey/vue-event-manager-jwt)
+
+[Frontend](https://github.com/nicistey/vue-event-manager-jwt) [Frontend](https://github.com/nicistey/vue-event-manager-jwt) [Frontend](https://github.com/nicistey/vue-event-manager-jwt)
+
+
+
 ## Содержание
 
 - [Начало работы](#начало-работы)
@@ -49,8 +60,15 @@ JWT_SECRET_KEY="***"
 Сформируйте строку подключения в формате: postgres://username:password@hostname:port/dbname.
   
   **Что бы покдючиться через PgAdmin**
-  **PHOTO**
-  **PHOTO**
+  
+  Создайте сервер
+  
+  ![FirstPgsql](READMEImage/FirstPgsql.png)
+  
+  Подключитесь,  [после запуска проекта в докере](#запуск-в-docker)
+  
+  ![SecondPgsql](READMEImage/SecondPgsql.jpg)
+  
 </details>
 
   **2. GOOGLE_CLIENT_ID** и **GOOGLE_CLIENT_SECRET**: Для получения этих ключей необходимо зарегистрировать ваше приложение в Google API Console. Создайте OAuth 2.0 Client ID и получите необходимые ключи.
@@ -63,17 +81,26 @@ JWT_SECRET_KEY="***"
 4) Перейдите в Navigation menu (три полоски у лого Console Logo) и перейдите в раздел APIs & Services
 5) Перейдите в раздел "OAuth consent screen".
 6) Выберите тип External
-**PHOTO**
+
+![External](READMEImage/External.png)
+
 7)  Заполните необходимые поля App name, Support email, Contact email addresses
-8)  После всех действий перейдите в раздел "Credentials" (Учетные данные).
-  **PHOTO**
+8)  После всех действий перейдите в раздел "Credentials".
+  
+  ![Credentials](READMEImage/Credentials.png)
+
 9)  Выберите Application type и тип Web application
-  **PHOTO**
+  
+  ![Application](READMEImage/Application.png)
+
 10)  В разделе Authorized redirect URIs укажите http://localhost:6080/auth/callback
      (в случае когда будете запускать сервер вне докера, не забудьте поменять порт)
-  **PHOTO**
+  
+  ![redirect](READMEImage/Redirect.png)
+
 11) Вы получите окно с необходимыми данными Client ID (GOOGLE_CLIENT_ID) и Client secret (GOOGLE_CLIENT_SECRET)
-  **PHOTO**
+  
+  ![Client](READMEImage/Client.jpg)
 </details>
 
   **3. GOOGLE_REDIRECT_URL**: URL для перенаправления после успешной авторизации через Google. В нашем случае это  `http://localhost:6080/auth/callback`.
