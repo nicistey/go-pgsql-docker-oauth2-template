@@ -27,8 +27,7 @@ func main() {
 	}
 	//обработчики
 	api:= api.New(mux.NewRouter(),db,cfg)
-	api.Hadle(cfg)
+	api.Handle(cfg)
 	//log.Fatal(api.ListenAndServe("localhost:8090"))
 	log.Fatal(api.ListenAndServe("0.0.0.0:8090"))
-	//
 }

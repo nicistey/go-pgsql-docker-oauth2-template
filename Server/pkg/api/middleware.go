@@ -24,11 +24,11 @@ func (api *api) middleware(next http.Handler) http.Handler {
 	
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			if (strings.HasPrefix(r.URL.Path,"/api/events"))||(strings.HasPrefix(r.URL.Path,"/auth")){ //Проверка только для /api/events
+			if (strings.HasPrefix(r.URL.Path,"/api/events"))||(strings.HasPrefix(r.URL.Path,"/auth")) || (strings.HasPrefix(r.URL.Path,"/health")){ //Проверка только для /api/events
 				next.ServeHTTP(w, r)
-				//http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")

@@ -20,7 +20,7 @@ func New(router *mux.Router, db *repository.PGRepo, cfg *config.Config) *api {
 
 
 
-func (api *api) Hadle(cfg *config.Config) {
+func (api *api) Handle(cfg *config.Config) {
 	//прописали, что функция принимает только гет метод прямо в инициализации, можно перечислять.Queries объясняем что возможно будем педавать
 	api.r.HandleFunc("/auth", api.handleGoogleAuth).Methods(http.MethodGet,http.MethodOptions)
 	api.r.HandleFunc("/auth/callback", api.handleGoogleCallback).Methods(http.MethodGet,http.MethodOptions)
@@ -36,10 +36,15 @@ func (api *api) Hadle(cfg *config.Config) {
 	api.r.HandleFunc("/api/events", api.newEvent).Methods(http.MethodPost, http.MethodOptions)
 	api.r.HandleFunc("/api/events/{IDev}", api.updateEvent).Methods(http.MethodPost, http.MethodOptions)
 	api.r.HandleFunc("/api/events/{IDev}", api.deleteEvent).Methods(http.MethodDelete, http.MethodOptions)
-
+	api.r.HandleFunc("/health", api.health).Methods(http.MethodGet)
 	api.r.Use(api.middleware)
 }
 
 func (api *api) ListenAndServe(addr string) error {
 	return http.ListenAndServe(addr, api.r)
+}
+
+func (api *api) health(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("OK"))
 }

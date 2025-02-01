@@ -63,11 +63,11 @@ JWT_SECRET_KEY="***"
   
   Создайте сервер
   
-  ![FirstPgsql](READMEImage/FirstPgsql.png)
+  ![FirstPgsql](https://github.com/nicistey/images-for-projects/blob/main/go-pgsql-docker-oauth2-template-image/FirstPgsql.png)
   
   Подключитесь,  [после запуска проекта в докере](#запуск-в-docker)
   
-  ![SecondPgsql](READMEImage/SecondPgsql.jpg)
+  ![SecondPgsql](https://github.com/nicistey/images-for-projects/blob/main/go-pgsql-docker-oauth2-template-image/SecondPgsql.jpg)
   
 </details>
 
@@ -82,25 +82,25 @@ JWT_SECRET_KEY="***"
 5) Перейдите в раздел "OAuth consent screen".
 6) Выберите тип External
 
-![External](READMEImage/External.png)
+![External](https://github.com/nicistey/images-for-projects/blob/main/go-pgsql-docker-oauth2-template-image/External.png)
 
 7)  Заполните необходимые поля App name, Support email, Contact email addresses
 8)  После всех действий перейдите в раздел "Credentials".
   
-  ![Credentials](READMEImage/Credentials.png)
+  ![Credentials](https://github.com/nicistey/images-for-projects/blob/main/go-pgsql-docker-oauth2-template-image/Credentials.png)
 
 9)  Выберите Application type и тип Web application
   
-  ![Application](READMEImage/Application.png)
+  ![Application](https://github.com/nicistey/images-for-projects/blob/main/go-pgsql-docker-oauth2-template-image/Application.png)
 
 10)  В разделе Authorized redirect URIs укажите http://localhost:6080/auth/callback
      (в случае когда будете запускать сервер вне докера, не забудьте поменять порт)
   
-  ![redirect](READMEImage/Redirect.png)
+  ![redirect](https://github.com/nicistey/images-for-projects/blob/main/go-pgsql-docker-oauth2-template-image/Redirect.png)
 
 11) Вы получите окно с необходимыми данными Client ID (GOOGLE_CLIENT_ID) и Client secret (GOOGLE_CLIENT_SECRET)
   
-  ![Client](READMEImage/Client.jpg)
+  ![Client](https://github.com/nicistey/images-for-projects/blob/main/go-pgsql-docker-oauth2-template-image/Client.jpg)
 </details>
 
   **3. GOOGLE_REDIRECT_URL**: URL для перенаправления после успешной авторизации через Google. В нашем случае это  `http://localhost:6080/auth/callback`.
