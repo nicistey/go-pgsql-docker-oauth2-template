@@ -27,7 +27,6 @@
   - [Клонирование репозитория](#клонирование-репозитория)
   - [Настройка окружения](#настройка-окружения)
   - [Получение ключей для .env](#получение-ключей-для-файла-env)
-  - [Создание таблиц events и users](#создание-таблиц-events-и-users)
   - [Запуск в Docker](#запуск-в-docker)
   - [Дополнительные шаги](#дополнительные-шаги)
 - [Примеры API запросов](#примеры-api-запросов)
@@ -116,28 +115,6 @@ JWT_SECRET_KEY="***"
   ` 1a+Aa/1a+lA1a1A1/aA1+a11a/AA+a1a+a1aA1+a1a1+a1a1+a/a1A1+a1a1a/a1a1a+a1a1+a/a1A1+a1a1a+a1a1/a1a1a+a/a1a1+a1a1+a/a1a1+a1a1+a/a1a1 `
 </details>
 
-## Создание таблиц events и users
-Стандартные таблицы без сложных ограничений и последовательностей
-```pgsql
-CREATE TABLE users (
-    IDus SERIAL PRIMARY KEY,  
-    IDGoogle VARCHAR(255) UNIQUE, 
-    name VARCHAR(255) NOT NULL,  
-    email VARCHAR(255) UNIQUE NOT NULL  
-);
-```
-
-```pgsql
-CREATE TABLE events (
-    IDev SERIAL PRIMARY KEY,  
-    IDus INTEGER NOT NULL REFERENCES users(IDus), оту
-    Event_name VARCHAR(255) NOT NULL,
-    Event_time TIMESTAMP WITH TIME ZONE, 
-    Description TEXT,
-    Location TEXT, 
-    Is_public BOOLEAN NOT NULL 
-);
-```
 ## Запуск в Docker
 Для запуска проекта в Docker выполните следующие команды:
 

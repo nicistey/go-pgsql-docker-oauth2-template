@@ -20,3 +20,5 @@ services:
         - POSTGRES_USER=nicis
         - POSTGRES_PASSWORD=123
         - POSTGRES_DB=kudago
+      volumes:
+        - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
