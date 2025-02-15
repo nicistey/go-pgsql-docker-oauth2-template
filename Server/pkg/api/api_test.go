@@ -10,7 +10,7 @@ import (
 
 func TestHandle(t *testing.T) {
     router := mux.NewRouter()
-    api := New(router, nil, nil)
+    api := New(router, nil, nil,nil)
     api.Handle(nil)
 
     req, _ := http.NewRequest("GET", "/health", nil)

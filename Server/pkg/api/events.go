@@ -6,22 +6,48 @@ import (
  "net/http"
  "strconv"
  "log"
+ "time"
  "github.com/gorilla/mux"
  "Server/pkg/models"
+ "Server/pkg/cache"
 
 )
-func (api *api) getAllEvents(w http.ResponseWriter, r *http.Request){
+func (api *api) getAllEvents(w http.ResponseWriter, r *http.Request) {
+    cacheKey := "events:all"
 
- data, err := api.db.GetEvents() //Изменён метод для фильтрации по ID пользователя
- if err != nil {
-   http.Error(w, err.Error(), http.StatusInternalServerError)
-   return
- }
- err = json.NewEncoder(w).Encode(data)
- if err != nil {
-   http.Error(w, err.Error(), http.StatusInternalServerError)
-   return
- }
+    // попытка получить данные из редис
+    cached, err := api.redis.Get(cache.Ctx, cacheKey).Result()
+    if err == nil && cached != "" {
+		log.Println("cached data is used")
+        w.Header().Set("Content-Type", "application/json")
+        w.Write([]byte(cached))
+        return
+    }
+	//если кэша нет, то берем из базы
+	log.Println("cached data is not used")
+    events, err := api.db.GetEvents()
+    if err != nil {
+		log.Println("error in getting data from db")
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    //записываем в джейсон, для кэширования в редис
+    response, err := json.Marshal(events)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+	//кэшируем на 5 минут
+    err = api.redis.Set(cache.Ctx, cacheKey, response, 5*time.Minute).Err()
+    if err != nil {
+		log.Println("error in setting cache")
+		log.Println(err.Error())
+    }
+	//отправляем данные клиенту
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(response)
 }
 
 
@@ -52,15 +78,15 @@ func (api *api) newEvent(w http.ResponseWriter, r *http.Request){
 	}
 	var events models.Event
 	//принимает указатель на структуру 
-	
 	err:=json.NewDecoder(r.Body).Decode(&events)
 	if err!=nil {
+		log.Println("error in parsing params")
 		http.Error(w, "error in parsing params", http.StatusInternalServerError)
 		return
 	}
-
 	id, err := api.db.NewEvent(events, userID)
 	if err!=nil {
+		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
