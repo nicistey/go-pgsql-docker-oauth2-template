@@ -18,13 +18,13 @@ func (api *api) getAllEvents(w http.ResponseWriter, r *http.Request) {
     // попытка получить данные из редис
     cached, err := api.redis.Get(cache.Ctx, cacheKey).Result()
     if err == nil && cached != "" {
-		log.Println("cached data is used")
+		log.Println("cached data events:all is used")
         w.Header().Set("Content-Type", "application/json")
         w.Write([]byte(cached))
         return
     }
 	//если кэша нет, то берем из базы
-	log.Println("cached data is not used")
+	log.Println("cached data events:all is not used")
     events, err := api.db.GetEvents()
     if err != nil {
 		log.Println("error in getting data from db")
@@ -57,16 +57,38 @@ func (api *api) getEventsByID(w http.ResponseWriter, r *http.Request){
 		http.Error(w, "Missing or invalid userID in context", http.StatusInternalServerError)
 		return
 	}
+
+	cacheKey := "events:"+strconv.Itoa(userID)
+	cached, err := api.redis.Get(cache.Ctx, cacheKey).Result()
+	if err == nil && cached != "" {
+		log.Println("cached data events:byID is used")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(cached))
+		return
+	}
+
+	log.Println("cached data events:byID is not used")
 	data, err := api.db.GetEventsByID(userID)
   	if err != nil {
     	http.Error(w, err.Error(), http.StatusInternalServerError)
     	return
   	}	
-  	err = json.NewEncoder(w).Encode(data)
-  	if err != nil {
-    	http.Error(w, err.Error(), http.StatusInternalServerError)
-    	return
-  	}
+
+	response, err := json.Marshal(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//кэшируем на 5 минут
+    err = api.redis.Set(cache.Ctx, cacheKey, response, 5*time.Minute).Err()
+    if err != nil {
+		log.Println("error in setting cache")
+		log.Println(err.Error())
+    }
+	//отправляем данные клиенту
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(response)
 }
 
 
