@@ -2,20 +2,21 @@ package api
 
 import (
 	"Server/pkg/repository"
-	"Server/config"
-	"net/http"
-	"github.com/gorilla/mux"
+    "Server/config"
+    "net/http"
+    "github.com/gorilla/mux"
+	"github.com/go-redis/redis/v8"
 )
 
 type api struct {
 	r   *mux.Router
 	db  *repository.PGRepo
 	cfg *config.Config 
-	
-   }
+    redis *redis.Client
+}
 
-func New(router *mux.Router, db *repository.PGRepo, cfg *config.Config) *api {
-	return &api{r: router, db: db, cfg: cfg}
+func New(router *mux.Router, db *repository.PGRepo, cfg *config.Config, redisClient *redis.Client) *api {
+	return &api{r: router, db: db, cfg: cfg,redis: redisClient}
 }
 
 

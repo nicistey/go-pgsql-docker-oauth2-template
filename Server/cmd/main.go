@@ -5,6 +5,7 @@ import (
 	"Server/pkg/repository"
 	"Server/config"
 	"log" 
+	"Server/pkg/cache"
 
 	"github.com/gorilla/mux"
 )
@@ -25,8 +26,12 @@ func main() {
 	if(err!=nil){
 		log.Fatal(err.Error())
 	}
+
+	
+    redisClient := cache.NewClient(cfg.ReddisAddr, cfg.RedisPassword, 0)
+
 	//обработчики
-	api:= api.New(mux.NewRouter(),db,cfg)
+	api:= api.New(mux.NewRouter(),db,cfg,redisClient)
 	api.Handle(cfg)
 	//log.Fatal(api.ListenAndServe("localhost:8090"))
 	log.Fatal(api.ListenAndServe("0.0.0.0:8090"))

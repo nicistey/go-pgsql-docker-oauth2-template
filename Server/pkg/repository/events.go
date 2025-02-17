@@ -110,12 +110,11 @@ func (repo *PGRepo) UpdateEvent(IDev int,item models.Event) (id int, err error) 
 	return id, err
 }
 
-func (repo *PGRepo) DeleteEvent(id int) ( err error) {//curl -X DELETE localhost:8090/api/events/6
-	// repo.mu.Lock()
-	// defer repo.mu.Unlock()
-  	_,err = repo.pool.Exec(context.Background(), `
-	DELETE FROM events WHERE IDev =$1;`,
-		id,
-	)
-	return err
+func (repo *PGRepo) DeleteEvent(id int) (userID int, err error) {
+    err = repo.pool.QueryRow(context.Background(), `
+        DELETE FROM events 
+        WHERE IDev = $1
+        RETURNING IDus;
+    `, id).Scan(&userID)
+    return userID, err
 }

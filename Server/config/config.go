@@ -13,6 +13,8 @@ type Config struct {
  GoogleClientSecret string
  GoogleRedirectURL 	string
  SecretJWTKey 		string
+ReddisAddr 		    string
+RedisPassword 	    string
 }
 //подключение (чтение) файла .env
 func LoadConfig() (*Config, error) {
@@ -27,9 +29,11 @@ func LoadConfig() (*Config, error) {
   GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
   GoogleRedirectURL: os.Getenv("GOOGLE_REDIRECT_URL"),
   SecretJWTKey: os.Getenv("JWT_SECRET_KEY"),
+  ReddisAddr: os.Getenv("REDIS_ADDR"),
+  RedisPassword: os.Getenv("REDIS_PASSWORD"),
  }
 //проверка на пустоту
- if config.DBConnString == "" || config.GoogleClientID == "" || config.GoogleClientSecret == "" || config.GoogleRedirectURL == ""|| config.SecretJWTKey == "" {
+ if config.DBConnString == "" || config.GoogleClientID == "" || config.GoogleClientSecret == "" || config.GoogleRedirectURL == ""|| config.SecretJWTKey == ""  || config.ReddisAddr == "" {
   return nil, fmt.Errorf("missing required environment variables")
  }
 

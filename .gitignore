@@ -1,0 +1,3 @@
+Server/cmd/main
+Server/pkg/repository/events_test.go
+Server/cmd/.env
