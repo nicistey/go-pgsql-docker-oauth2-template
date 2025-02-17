@@ -112,6 +112,19 @@ func (api *api) newEvent(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// удаление кеша для events:all
+	err = api.redis.Del(cache.Ctx, "events:all").Err();
+    if  err != nil {
+        log.Println("error deleting events:all cache: " + err.Error())
+    }
+    // удаление кеша для events:byID
+    userCacheKey := "events:" + strconv.Itoa(userID)
+	err = api.redis.Del(cache.Ctx, userCacheKey).Err()
+    if  err != nil {
+        log.Println("error deleting " + userCacheKey + " cache: " + err.Error())
+    }
+
 	err=json.NewEncoder(w).Encode(id)
 	if err!=nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -140,6 +153,19 @@ func (api *api) updateEvent(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// удаление кеша для events:all
+	err = api.redis.Del(cache.Ctx, "events:all").Err();
+    if  err != nil {
+        log.Println("error deleting events:all cache: " + err.Error())
+    }
+    // удаление кеша для events:byID
+    userCacheKey := "events:" + strconv.Itoa(events.IDus)
+	err = api.redis.Del(cache.Ctx, userCacheKey).Err()
+    if  err != nil {
+        log.Println("error deleting " + userCacheKey + " cache: " + err.Error())
+    }
+
 	err=json.NewEncoder(w).Encode(id)
 	if err!=nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -158,11 +184,22 @@ func (api *api) deleteEvent(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = api.db.DeleteEvent(id)
+	userID,err := api.db.DeleteEvent(id)
 	if err!= nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	// удаление кеша для events:all
+	err = api.redis.Del(cache.Ctx, "events:all").Err();
+    if  err != nil {
+        log.Println("error deleting events:all cache: " + err.Error())
+    }
+    // удаление кеша для events:byID
+    userCacheKey := "events:" + strconv.Itoa(userID)
+	err = api.redis.Del(cache.Ctx, userCacheKey).Err()
+    if  err != nil {
+        log.Println("error deleting " + userCacheKey + " cache: " + err.Error())
+    }
 }
 
 

@@ -27,8 +27,8 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	redisAddr := "redis:6379"
-    redisClient := cache.NewClient(redisAddr, "", 0)
+	
+    redisClient := cache.NewClient(cfg.ReddisAddr, cfg.RedisPassword, 0)
 
 	//обработчики
 	api:= api.New(mux.NewRouter(),db,cfg,redisClient)
